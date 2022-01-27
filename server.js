@@ -34,9 +34,30 @@ const run = async () => {
       res.send(result);
     });
     app.get("/blogs/status", async (req, res) => {
-      const query = { status: "pending" };
-      const result = await BlogsCollection.find(query).toArray();
-      res.send(result);
+      // const query = req.query;
+      // console.log(query);
+
+      const queryDB = { status: "approved" };
+      const cursor = await BlogsCollection.find(queryDB);
+      const count = await cursor.count();
+      const page = req.query.page;
+      const showItems = parseInt(req.query.showPages);
+      // console.log("items", showItems);
+      // console.log("page", page);
+      let result;
+      if (page) {
+        result = await cursor
+          .skip(page * showItems)
+          .limit(showItems)
+          .toArray();
+      } else {
+        result = await cursor.toArray();
+      }
+
+      res.send({
+        count,
+        result,
+      });
     });
     app.get("/blogs/edit/:id", async (req, res) => {
       const id = req.params.id;
@@ -113,17 +134,17 @@ const run = async () => {
       res.json(result);
     });
 
-    app.put("/blogs", async (req, res) => {
-      const doc = req.body;
-      const id = doc._id;
+    app.put("/blogs/update-status/:id", async (req, res) => {
+      const id = req.params.id;
       const filter = { _id: ObjectId(id) };
       const updateDoc = {
         $set: {
-          status: doc.status,
+          status: "approved",
         },
       };
+
       const result = await BlogsCollection.updateOne(filter, updateDoc);
-      res.json(result);
+      res.send(result);
     });
     //delete blogs using id
     app.delete("/blogs/:id", async (req, res) => {
@@ -179,7 +200,8 @@ const run = async () => {
 
     //Review
     app.get("/reviews", async (req, res) => {
-      res.send("from review");
+      const result = await reviewsCollection.find({}).toArray();
+      res.send(result);
     });
     app.post("/reviews", async (req, res) => {
       const reviewDoc = req.body;
