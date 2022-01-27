@@ -14,7 +14,7 @@ app.use(express.json());
 app.use(fileupload());
 
 //database
-const uri = `mongodb+srv://droneShop:lMOWCEwvJUM8FyXa@cluster0.hoxgz.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.hoxgz.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
