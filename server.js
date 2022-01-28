@@ -59,6 +59,11 @@ const run = async () => {
         result,
       });
     });
+    app.get("/blogs/pending", async (req, res) => {
+      const query = { status: "pending" };
+      const result = await BlogsCollection.find(query).toArray();
+      res.send(result);
+    });
     app.get("/blogs/edit/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
@@ -72,7 +77,6 @@ const run = async () => {
       res.send(result);
     });
     app.post("/blogs", async (req, res) => {
-      //   console.log(req.body);
       const blog = req.body;
       const title = blog.title;
       const description = blog.description;
@@ -103,7 +107,6 @@ const run = async () => {
 
     app.put("/blogs/:id", async (req, res) => {
       const id = req.params.id;
-      console.log("cekied");
 
       const blog = req.body;
       const title = blog.title;
@@ -175,13 +178,11 @@ const run = async () => {
     });
     app.post("/users", async (req, res) => {
       const doc = req.body;
-      console.log(doc);
       const result = await usersCollection.insertOne(doc);
       res.json(result);
     });
     app.put("/users", async (req, res) => {
       const user = req.body;
-      // console.log(user);
       const query = { email: user?.email };
       const options = { upsert: true };
       const updateDoc = { $set: user };
